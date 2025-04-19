@@ -2,16 +2,19 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>My AR App</title>
+    <title>My AR App with Location</title>
 
     <!-- A-Frame（3DをHTMLで描けるライブラリ） -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
 
     <!-- AR.js（マーカーARをWebで動かすライブラリ） -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
+
+    <!-- 外部JavaScriptファイルの読み込み -->
+    <script src="script.js"></script>
   </head>
 
-  <body>
+  <body onload="getLocation();">
     <a-scene 
        embedded 
        arjs="sourceType: webcam; debugUIEnabled: true;"
@@ -20,13 +23,8 @@
       <!-- カメラ -->
       <a-entity camera></a-entity>
       
-      <!-- カメラに固定されたテキスト -->
-      <a-text value="こんにちは！" 
-              position="0 1.5 -3"  
-              rotation="0 0 0" 
-              color="blue" 
-              scale="3 3 3">
-      </a-text>
+      <!-- 現在地に表示されるAR要素 -->
+      <a-box id="location-marker" position="0 1.5 -3" color="red"></a-box>
     </a-scene>
   </body>
 </html>
