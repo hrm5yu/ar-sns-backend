@@ -16,7 +16,9 @@
       <a-entity id="arMessage" gps-entity-place="latitude: 35.65797971687743; longitude: 139.86785618732947"
         text="value: ; align: center; color: #fff; width: 10" position="0 2 0"></a-entity>
     </a-scene>
-
+    <div id="errorMessage" style="display: none; color: red; text-align: center;">
+      名前とメッセージを入力してください！
+    </div>
     <!-- 書き込みフォーム -->
     <div class="form-container">
       <input type="text" id="nameInput" placeholder="名前を入力" />
@@ -24,9 +26,7 @@
       <button id="submitMessage">送信</button>
     </div>
     <!-- エラーメッセージ表示 -->
-    <div id="errorMessage" style="display: none; color: red; text-align: center;">
-      名前とメッセージを入力してください！
-    </div>
+    
 
 
     <script src="app.js"></script>
