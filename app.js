@@ -4,7 +4,6 @@ document.getElementById("submitMessage").addEventListener("click", function () {
 
   // 名前とメッセージが入力されていない場合の処理
   if (!name || !message) {
-    
     return;  // 入力がない場合、処理を中止してカメラを更新させる
   }
 
