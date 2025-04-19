@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>My AR App with Location</title>
-
-    <!-- A-Frame（3DをHTMLで描けるライブラリ） -->
+    <meta charset="utf-8" />
+    <title>Location AR Prototype</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-
-    <!-- AR.js（マーカーARをWebで動かすライブラリ） -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
-
-    <!-- 外部JavaScriptファイルの読み込み -->
-    <script src="myapp.js"></script>
+    <style>
+      body, html { margin: 0; padding: 0; overflow: hidden; }
+    </style>
   </head>
 
-  <body onload="getLocation();">
-    <a-scene 
-       embedded 
-       arjs="sourceType: webcam; debugUIEnabled: true;"
-       renderer="logarithmicDepthBuffer: true; antialias: true; precision: medium;">
-      
-      <!-- カメラ -->
-      <a-entity camera></a-entity>
-      
-      <!-- 現在地に表示されるAR要素 -->
-      <a-box id="location-marker" position="0 1.5 -3" color="red"></a-box>
+  <body>
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      arjs="sourceType: webcam; gpsMinAccuracy: 100; debugUIEnabled: false;"
+    >
+      <!-- ユーザーの位置を取得 -->
+      <a-camera gps-camera rotation-reader></a-camera>
+
+      <!-- 特定の場所に赤いボックスを表示 -->
+      <a-text
+        value="ここにメッセージ！"
+        gps-entity-place="latitude: 35.658386704795554; longitude: 139.86784612904566"
+        position="0 2 0"
+        scale="20 20 20"
+        color="white">
+      </a-text>
+
     </a-scene>
   </body>
 </html>
