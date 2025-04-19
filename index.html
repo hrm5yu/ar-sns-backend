@@ -2,54 +2,28 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>高度ARテスト</title>
+    <title>AR メッセージとフォーム</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
-    <style>
-      html, body {
-        margin: 0;
-        overflow: hidden;
-        height: 100%;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
 
   <body>
-    <a-scene
-      embedded
-      vr-mode-ui="enabled: false"
-      arjs="sourceType: webcam; gpsMinAccuracy: 100; debugUIEnabled: false;"
-    >
-      <!-- カメラ＋GPS連携 -->
-      <a-camera gps-camera rotation-reader></a-camera>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+      <a-camera gps-camera="gpsMinAccuracy: 30; gpsHighAccuracy: true"></a-camera>
 
-      <!-- 高度調整されるボックス（初期位置） -->
-      <a-box
-        id="alt-box"
-        gps-entity-place="latitude: 35.65797971687743; longitude: 139.86785618732947"
-        position="0 0 0"
-        scale="5 5 5"
-        material="color: red;"
-      ></a-box>
+      <!-- 指定の位置に表示するメッセージ -->
+      <a-entity id="arMessage" gps-entity-place="latitude: 35.65797971687743; longitude: 139.86785618732947"
+        text="value: ; align: center; color: #fff; width: 10" position="0 2 0"></a-entity>
     </a-scene>
 
-    <script>
-      window.addEventListener('gps-camera-update-position', (e) => {
-        const coords = e.detail.position;
-        const altitude = coords.altitude;
+    <!-- 書き込みフォーム -->
+    <div class="form-container">
+      <input type="text" id="nameInput" placeholder="名前を入力" />
+      <textarea id="messageInput" placeholder="メッセージを入力"></textarea>
+      <button id="submitMessage">送信</button>
+    </div>
 
-        if (altitude !== null) {
-          console.log("高度:", altitude);
-          const box = document.getElementById('alt-box');
-
-          // 高度に応じてY座標を調整（例：地上から+5m浮かせる）
-          const boxHeight = altitude + 5;
-
-          box.setAttribute('position', `0 ${boxHeight} 0`);
-        } else {
-          console.log("高度が取得できませんでした");
-        }
-      });
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>
