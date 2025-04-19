@@ -11,5 +11,6 @@ document.getElementById("submitMessage").addEventListener("click", function () {
     document.getElementById("messageInput").value = "";
   } else {
     alert("名前とメッセージを入力してください！");
+    return;
   }
 });
