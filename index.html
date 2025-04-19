@@ -16,9 +16,8 @@
     <!-- A-FrameでARを使うシーンの定義 -->
     <a-scene 
        embedded 
-       arjs="markersAreaEnabled: true; sourceType: webcam; debugUIEnabled: false;"
-       vr-mode-ui="enabled: false"
-       renderer="logarithmicDepthBuffer: true; antialias: true; precision: medium; xrCompatible: true"
+       arjs="markersAreaEnabled: false; sourceType: webcam; debugUIEnabled: false;" 
+       renderer="logarithmicDepthBuffer: true; antialias: true; precision: medium;"
     >
       <a-marker preset="hiro">
         <a-box position="0 0.5 0" material="color: red;"></a-box>
