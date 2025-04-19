@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-    <title>ARメッセージ</title>
+    <meta charset="utf-8">
+    <title>My AR App</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-    <script src="app.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
+      body, html {
+        margin: 0;
+        overflow: hidden;
+        height: 100%;
+        background-color: black;
+      }
     </style>
   </head>
+
   <body>
     <a-scene embedded arjs>
+      <!-- hiroマーカーの上に赤い箱を表示 -->
       <a-marker preset="hiro">
         <a-box position="0 0.5 0" material="color: red;"></a-box>
       </a-marker>
+      
+      <!-- カメラ -->
       <a-entity camera></a-entity>
     </a-scene>
   </body>
 </html>
-
-
