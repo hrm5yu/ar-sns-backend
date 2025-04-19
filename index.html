@@ -22,15 +22,12 @@
 
   <body>
     <!-- A-FrameでARを使うシーンの定義 -->
-    <a-scene embedded arjs>
-      
-      <!-- Hiroマーカー上に赤いボックスを表示 -->
+    <a-scene embedded arjs="debugUIEnabled: false;">
       <a-marker preset="hiro">
         <a-box position="0 0.5 0" material="color: red;"></a-box>
       </a-marker>
-
-      <!-- カメラエンティティ -->
       <a-entity camera></a-entity>
     </a-scene>
+    
   </body>
 </html>
