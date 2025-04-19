@@ -13,22 +13,13 @@
     </style>
   </head>
   <body>
-    <a-scene embedded arjs="sourceType: webcam;">
-      <!-- 最初は固定の位置にメッセージを表示 -->
-      <a-text
-        value="ようこそ！"
-        position="0 0 -1"
-        look-at="[camera]"
-        color="red"
-      ></a-text>
-      <a-camera-static></a-camera-static>
+    <a-scene embedded arjs>
+      <a-marker preset="hiro">
+        <a-box position="0 0.5 0" material="color: red;"></a-box>
+      </a-marker>
+      <a-entity camera></a-entity>
     </a-scene>
   </body>
 </html>
 
-<a-scene embedded arjs>
-  <a-marker preset="hiro">
-    <a-box position="0 0.5 0" material="color: red;"></a-box>
-  </a-marker>
-  <a-entity camera></a-entity>
-</a-scene>
+
