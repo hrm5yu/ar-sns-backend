@@ -8,17 +8,17 @@ function getLocation() {
 }
 
 function showPosition(position) {
-  var lat = position.coords.latitude;
-  var lon = position.coords.longitude;
+  var lat = position.coords.latitude;  // 緯度
+  var lon = position.coords.longitude; // 経度
 
-  // 緯度経度をARの座標に変換する処理を書くことができます。
-  // 例えば、緯度と経度をもとにAR内での位置を決定するために、適切なスケーリングを行います。
-
-  console.log("Latitude: " + lat + " Longitude: " + lon);
-
-  // 位置情報を元にAR内で表示する要素を動的に追加します
-  const marker = document.querySelector('#location-marker');
-  marker.setAttribute('position', `${lat} 1.5 ${lon}`);
+  // 位置情報をARの座標に変換する（AR空間内の位置に反映）
+  // ここでは、単純に緯度と経度を直接使って位置を設定しますが、通常はAR空間でのスケーリングを行う必要があります
+  var x = lon / 1000;  // 経度に基づく座標（簡単なスケーリング）
+  var z = lat / 1000;  // 緯度に基づく座標（簡単なスケーリング）
+  
+  // ボックスの位置を更新
+  var marker = document.querySelector('#location-marker');
+  marker.setAttribute('position', `${x} 1.5 ${z}`);
 }
 
 function showError(error) {
