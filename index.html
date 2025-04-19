@@ -2,11 +2,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Location AR Prototype</title>
+    <title>高度ARテスト</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
     <style>
-      body, html { margin: 0; padding: 0; overflow: hidden; }
+      html, body {
+        margin: 0;
+        overflow: hidden;
+        height: 100%;
+      }
     </style>
   </head>
 
@@ -16,18 +20,36 @@
       vr-mode-ui="enabled: false"
       arjs="sourceType: webcam; gpsMinAccuracy: 100; debugUIEnabled: false;"
     >
-      <!-- ユーザーの位置を取得 -->
+      <!-- カメラ＋GPS連携 -->
       <a-camera gps-camera rotation-reader></a-camera>
 
-      <!-- 特定の場所に赤いボックスを表示 -->
-      <a-text
-        value="ここにメッセージ！"
+      <!-- 高度調整されるボックス（初期位置） -->
+      <a-box
+        id="alt-box"
         gps-entity-place="latitude: 35.658386704795554; longitude: 139.86784612904566"
-        position="0 2 0"
-        scale="200 200 200"
-        color="white">
-      </a-text>
-
+        position="0 0 0"
+        scale="5 5 5"
+        material="color: red;"
+      ></a-box>
     </a-scene>
+
+    <script>
+      window.addEventListener('gps-camera-update-position', (e) => {
+        const coords = e.detail.position;
+        const altitude = coords.altitude;
+
+        if (altitude !== null) {
+          console.log("高度:", altitude);
+          const box = document.getElementById('alt-box');
+
+          // 高度に応じてY座標を調整（例：地上から+5m浮かせる）
+          const boxHeight = altitude + 5;
+
+          box.setAttribute('position', `0 ${boxHeight} 0`);
+        } else {
+          console.log("高度が取得できませんでした");
+        }
+      });
+    </script>
   </body>
 </html>
