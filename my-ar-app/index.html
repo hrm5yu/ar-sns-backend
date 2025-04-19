@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ARメッセージ</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="app.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <a-scene embedded arjs="sourceType: webcam;">
+      <!-- 最初は固定の位置にメッセージを表示 -->
+      <a-text
+        value="ようこそ！"
+        position="0 0 -1"
+        look-at="[camera]"
+        color="red"
+      ></a-text>
+      <a-camera-static></a-camera-static>
+    </a-scene>
+  </body>
+</html>
