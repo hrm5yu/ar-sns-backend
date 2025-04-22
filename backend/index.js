@@ -16,11 +16,9 @@ app.post('/posts', async (req, res) => {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  const createdAt = admin.firestore.FieldValue.serverTimestamp();
-
   // 新しい投稿のデータ
   const newPost = {
-    createdAt,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
     latitude,
     longitude,
     text,
