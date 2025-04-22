@@ -37,6 +37,32 @@ app.post('/posts', async (req, res) => {
   }
 });
 
+app.post("/spots", async (req, res) => {
+    const {name, latitude, longitude, tags, isActive, description} = req.body;
+
+    if ( !name || !latitude || !longitude || !tags || !isActive || !description) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    const newSpot = {
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      name,
+      latitude,
+      longitude,
+      tags,
+      isActive,
+      description
+    }
+    try {
+      const docRef = await db.collection('spots').add(newSpot);
+      res.status(201).json({
+        id: docRef.id,
+        ...newSpot
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Error adding spot: ' + error.message });
+    }
+});
+
 // サーバーを起動
 const port = 3000;
 app.listen(port, () => {
