@@ -63,6 +63,21 @@ app.post("/spots", async (req, res) => {
     }
 });
 
+app.get("/spots", async (req,res) => {
+  try {
+    const snapshot = await db.collection('spots').get();
+
+    const spots = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.status(200).json(spots);
+  }catch(error){
+    res.status(500).json({error: 'Error fetching spots: ' + error.message});
+  }
+});
+
 // サーバーを起動
 const port = 3000;
 app.listen(port, () => {
