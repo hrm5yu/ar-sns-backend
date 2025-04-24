@@ -6,3 +6,4 @@ src/serviceAccountKey.json
 node_modules
 uploads/**
 dist/
+*.js
