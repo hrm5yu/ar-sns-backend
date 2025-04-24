@@ -12,7 +12,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "ts-node src/app.ts"
+    "start": "ts-node dist/app.js"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
