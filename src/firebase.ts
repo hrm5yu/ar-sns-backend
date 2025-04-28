@@ -1,10 +1,9 @@
-import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json";
+import * as admin from 'firebase-admin';
+
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY as string);
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+  credential: admin.credential.cert(serviceAccount),
 });
 
-const db = admin.firestore();
-
-export { db, admin };
+export const db = admin.firestore();
