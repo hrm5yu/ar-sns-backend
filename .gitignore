@@ -2,5 +2,8 @@
 .env
 firebase-debug.log
 .DS_Store
-backend/node_modules/
-backend/serviceAccountKey.json
+src/serviceAccountKey.json
+node_modules
+uploads/**
+dist/
+*.js
