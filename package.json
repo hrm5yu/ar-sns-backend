@@ -12,7 +12,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "ts-node dist/app.js",
+    "start": "node dist/app.js",
     "build": "tsc"
   },
   "dependencies": {
