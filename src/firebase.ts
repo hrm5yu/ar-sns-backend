@@ -6,9 +6,11 @@ const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY as string);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
+  storageBucket: 'arsns-dcb2c.appspot.com'
 });
 
+const bucket = admin.storage().bucket();
 
-export { admin };
+export { admin, bucket };
 
 export const db = admin.firestore();
