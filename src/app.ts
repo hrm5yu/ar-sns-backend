@@ -57,8 +57,15 @@ app.post(
 
     stream.on('finish', async () => {
       // アップロードが完了したら公開URLを生成
-      await fileUpload.makePublic();  // アクセスを公開する（セキュリティポリシーに注意）
+      try {
+        await fileUpload.makePublic(); // アクセスを公開する（セキュリティポリシーに注意）
+      } catch (error) {
+        console.error('Failed to make file public:', error);
+        res.status(500).json({ error: 'Failed to make file public' });
+        return;
+      } 
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      console.log("Using bucket:", bucket.name);
 
     const { latitude, longitude, text, userId } = req.body;
     if (!latitude || !longitude || !text || !userId) {
