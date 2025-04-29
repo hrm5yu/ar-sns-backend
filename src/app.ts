@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { db, admin } from './firebase';
+import { db, admin, bucket } from './firebase';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
@@ -20,17 +20,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Multerの設定
-const storage = multer.diskStorage({
-  destination: (req: Request, file: Express.Multer.File, cb: (err: Error | null, dest: string) => void) => {
-    cb(null, uploadDir);
-  },
-  filename: (req: Request, file: Express.Multer.File, cb: (err: Error | null, name: string) => void) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
-  },
-});
-
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // エラーハンドリング用ミドルウェア
 const asyncHandler = (
@@ -48,7 +38,34 @@ app.post(
       res.status(400).send('No file uploaded.');
       return;
     }
-    const imageUrl = `/uploads/${file.filename}`;
+    // ファイルパスを作成
+    const fileName = `${Date.now()}_${file.originalname}`;
+    const fileUpload = bucket.file(fileName);
+
+    // Firebase Storageにアップロード
+    const stream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
+
+    
+    stream.on('error', (err) => {
+      console.error(err);
+      res.status(500).json({ error: 'Error uploading file to storage' });
+    });
+
+    stream.on('finish', async () => {
+      // アップロードが完了したら公開URLを生成
+      try {
+        await fileUpload.makePublic(); // アクセスを公開する（セキュリティポリシーに注意）
+      } catch (error) {
+        console.error('Failed to make file public:', error);
+        res.status(500).json({ error: 'Failed to make file public' });
+        return;
+      } 
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      console.log("Using bucket:", bucket.name);
 
     const { latitude, longitude, text, userId } = req.body;
     if (!latitude || !longitude || !text || !userId) {
@@ -62,16 +79,15 @@ app.post(
       longitude: parseFloat(longitude),
       text,
       userId,
-      imageUrl,
+      imageUrl: publicUrl,
     };
 
     const docRef = await db.collection('posts').add(newPost);
     res.status(201).json({ id: docRef.id, ...newPost });
   })
+  stream.end(file.buffer);
+})
 );
-
-// 静的ファイル提供（画像を参照できるように）
-app.use('/uploads', express.static(uploadDir));
 
 // テキスト投稿エンドポイント
 app.post(
