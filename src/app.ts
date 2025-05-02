@@ -28,6 +28,35 @@ const asyncHandler = (
 ) => (req: Request, res: Response, next: NextFunction) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
+// 認証トークンを検証するミドルウェア
+const authenticate = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ message: '認証トークンがありません' });
+    return;
+  }
+
+  const idToken = authHeader.split('Bearer ')[1];
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    // トークンが有効な場合、ユーザー情報をリクエストに追加
+    (req as any).user = decodedToken;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'トークンの検証に失敗しました', error });
+    return;
+  }
+};
+
+// 認証が必要なAPI
+app.get('/profile', authenticate, (req, res) => {
+  const user = (req as any).user;
+  res.json({ message: '認証成功', uid: user.uid, email: user.email });
+});
+
+
 // 画像投稿用エンドポイント
 app.post(
   '/posts-image',
