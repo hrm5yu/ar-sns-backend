@@ -3,6 +3,7 @@ import { db, admin, bucket } from './firebase';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
+import cors from 'cors';
 import fs from 'fs';
 
 // MulterRequest 型定義
@@ -11,7 +12,10 @@ interface MulterRequest extends Request {
 }
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
+
+
 
 // アップロード保存先ディレクトリ
 const uploadDir = path.join(__dirname, '..', 'uploads');
