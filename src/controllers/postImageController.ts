@@ -3,7 +3,7 @@ import { bucket, admin } from '../utils/firebase';
 
 const db = admin.firestore();
 
-export const uploadPostImage = async (req: Request, res: Response) => {
+export const uploadPostImage = async (req: Request, res: Response): Promise<any> => {
   const file = (req as any).file as Express.Multer.File;
   if (!file) {
     return res.status(400).json({ error: 'No file uploaded.' });

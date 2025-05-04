@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { uploadPostImage } from '../controllers/postImageController';
 import { authenticate } from '../middlewares/authenticate';
+import { asyncHandler } from '../middlewares/asyncHandlers';
 
 const router = express.Router();
 
@@ -11,11 +12,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
-router.post(
-  '/', 
-  authenticate,            // 認証
-  upload.single('image'),  // 画像ファイルだけ受け取る
-  uploadPostImage          // コントローラに委譲
-);
+router.post('/', authenticate, upload.single('image'), asyncHandler(uploadPostImage));
 
 export default router;

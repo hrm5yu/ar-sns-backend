@@ -1,6 +1,7 @@
 import express from 'express';
 import { createSpot, getAllSpots } from '../controllers/spotController'
 import { authenticate } from '../middlewares/authenticate';
+import { asyncHandler } from '../middlewares/asyncHandlers';
 
 const router = express.Router();
 
@@ -8,6 +9,6 @@ const router = express.Router();
 router.get('/', getAllSpots)
 
 // スポット作成（要認証）
-router.post('/', authenticate, createSpot);
+router.post('/', authenticate, asyncHandler(createSpot));
 
 export default router;
