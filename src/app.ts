@@ -126,9 +126,17 @@ app.post(
 app.post(
   '/posts',
   asyncHandler(async (req: Request, res: Response) => {
-    const { latitude, longitude, text, userId } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ error: '未認証' });
+      return;
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userId = decodedToken.uid;
+    const { latitude, longitude, text } = req.body;
 
-    if (!latitude || !longitude || !text || !userId) {
+    if (!latitude || !longitude || !text) {
       res.status(400).json({ error: 'All fields are required' });
       return;
     }
