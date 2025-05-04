@@ -1,10 +1,19 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { db, admin, bucket } from './firebase';
+import { db, admin, bucket } from './utils/firebase';
+import { DecodedIdToken } from 'firebase-admin/auth';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
 import cors from 'cors';
 import fs from 'fs';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: DecodedIdToken;
+    }
+  }
+}
 
 // MulterRequest 型定義
 interface MulterRequest extends Request {
@@ -33,26 +42,32 @@ const asyncHandler = (
   Promise.resolve(fn(req, res, next)).catch(next);
 
 // 認証トークンを検証するミドルウェア
-const authenticate = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const authenticate = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
   const authHeader = req.headers.authorization;
-
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: '認証トークンがありません' });
-    return;
+    return res.status(401).json({ message: '認証トークンがありません' });
   }
-
   const idToken = authHeader.split('Bearer ')[1];
-
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     // トークンが有効な場合、ユーザー情報をリクエストに追加
     (req as any).user = decodedToken;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'トークンの検証に失敗しました', error });
-    return;
+    return res.status(401).json({ message: 'トークンの検証に失敗しました', error });
   }
 };
+
+
+// エラー処理ミドルウェア
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 // 認証が必要なAPI
 app.get('/profile', authenticate, (req, res) => {
@@ -155,46 +170,7 @@ app.post(
 );
 
 // スポット作成エンドポイント
-app.post(
-  '/spots',
-  asyncHandler(async (req: Request, res: Response) => {
-    const { name, latitude, longitude, tags, isActive, description } = req.body;
 
-    if (!name || latitude == null || longitude == null || !tags || isActive == null || !description) {
-      res.status(400).json({ error: 'All fields are required' });
-      return;
-    }
-
-    const newSpot = {
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      name,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      tags,
-      isActive,
-      description,
-    };
-
-    const docRef = await db.collection('spots').add(newSpot);
-    res.status(201).json({ id: docRef.id, ...newSpot });
-  })
-);
-
-// スポット一覧取得エンドポイント
-app.get(
-  '/spots',
-  asyncHandler(async (_req: Request, res: Response) => {
-    const snapshot = await db.collection('spots').get();
-    const spots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    res.status(200).json(spots);
-  })
-);
-
-// エラー処理ミドルウェア
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
 
 // サーバー起動
 const port = process.env.PORT || 3000;

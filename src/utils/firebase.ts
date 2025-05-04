@@ -9,11 +9,6 @@ admin.initializeApp({
   storageBucket: 'arsns-dcb2c.firebasestorage.app',    
 });
 
-
 const bucket = admin.storage().bucket();
 
-
-
 export { admin, bucket };
-
-export const db = admin.firestore();
