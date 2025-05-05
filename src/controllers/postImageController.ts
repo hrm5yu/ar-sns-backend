@@ -9,9 +9,16 @@ export const uploadPostImage = async (req: Request, res: Response): Promise<any>
     return res.status(400).json({ error: 'No file uploaded.' });
   }
   const user = (req as any).user;    // authenticate でセット済み
+  if (!req.user || !req.user.uid) {
+    return res.status(400).json({ error: 'Unauthorized' });
+  }
   const { latitude, longitude, text } = req.body;
-  if (!latitude || !longitude || !text) {
-    return res.status(400).json({ error: '全ての項目を入力してください' });
+  const isValidLatitude = typeof latitude === 'number' && latitude >= -90 && latitude <= 90;
+  const isValidLongitude = typeof longitude === 'number' && longitude >= -180 && longitude <= 180;
+  const isValidText = typeof text === 'string' && text.length > 0 && text.length <= 200;
+  
+  if (!isValidLatitude || !isValidLongitude || !isValidText) {
+    return res.status(400).json({ error: 'Invalid request body' });
   }
   // 1) Firebase Storage にアップロード
   const fileName = `${Date.now()}_${file.originalname}`;
@@ -31,8 +38,8 @@ export const uploadPostImage = async (req: Request, res: Response): Promise<any>
       // 2) Firestore に投稿ドキュメントを作成
       const newPost = {
         userId: user.uid,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude,
+        longitude,
         text,
         imageUrl,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
