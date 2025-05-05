@@ -7,12 +7,12 @@ describe('POST /posts - createPost handler', () => {
 
   const setupApp = async (authMock: any) => {
     // 認証モック
-    jest.mock('../src/middlewares/authenticate', () => ({
+    jest.mock('../middlewares/authenticate', () => ({
       authenticate: authMock,
     }));
 
     // Firebaseモック
-    jest.mock('../src/utils/firebase', () => {
+    jest.mock('../utils/firebase', () => {
       const mockAdd = jest.fn().mockResolvedValue({ id: 'mockPostId' });
       return {
         admin: {
@@ -29,7 +29,7 @@ describe('POST /posts - createPost handler', () => {
       };
     });
 
-    const { createApp } = require('../src/createApp');
+    const { createApp } = require('../createApp');
     return createApp();
   };
 
