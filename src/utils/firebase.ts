@@ -10,5 +10,7 @@ admin.initializeApp({
 });
 
 const bucket = admin.storage().bucket();
+const db = admin.firestore();
+const FieldValue = admin.firestore.FieldValue;
 
-export { admin, bucket };
+export { admin, bucket, db, FieldValue };
