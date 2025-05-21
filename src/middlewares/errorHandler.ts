@@ -8,6 +8,9 @@ export const errorHandler = (
 ) => {
   console.error(err.stack);
 
+  const status = err.status || 500;
+  const message = err.message;
+
   if (err.message === 'Only image files are allowed') {
     return res.status(400).json({ error: err.message });
   }
@@ -17,9 +20,7 @@ export const errorHandler = (
     return res.status(400).json({ error: err.message });
   }
 
-  const status = err.status || 500;
-  const message =
-    process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error';
+  
 
   res.status(status).json({ error: message });
 };

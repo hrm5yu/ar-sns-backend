@@ -9,7 +9,7 @@ export const uploadPostImage = async (req: Request, res: Response): Promise<any>
   if (!req.user || !req.user.uid) {
     return res.status(400).json({ error: 'Unauthorized' });
   }
-  const user = (req as any).user;    // authenticate でセット済み
+  const user = (req as any).user;
   const latitude = parseFloat(req.body.latitude);
   const longitude = parseFloat(req.body.longitude);
   const text = req.body.text;
@@ -30,30 +30,28 @@ export const uploadPostImage = async (req: Request, res: Response): Promise<any>
   };
 
   if (file) {
-  // 1) Firebase Storage にアップロード
-  const fileName = `${Date.now()}_${file.originalname}`;
-  const fileObj = bucket.file(fileName);
-  const stream = fileObj.createWriteStream({
-    metadata: { contentType: file.mimetype }
-    });
-  stream.on('error', (err) => {
-    console.error(err);
-    return res.status(500).json({ error: '画像アップロード失敗' });
-  });
-  stream.on('finish', async () => {
+    const fileName = `${Date.now()}_${file.originalname}`;
+    const fileObj = bucket.file(fileName);
+
     try {
-      await fileObj.makePublic();
-      newPost.imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      // Firebase Storageにファイルを保存
+      await fileObj.save(file.buffer, {
+        metadata: { contentType: file.mimetype },
+      });
+
+      // 画像のパブリックURLを直接構築
+      const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+      newPost.imageUrl = imageUrl;
+
       const docRef = await db.collection('posts').add(newPost);
-      return res.status(201).json({ id: docRef.id, ...newPost });
-    } catch (e) {
-      console.error(e);
-      return res.status(500).json({ error: '投稿作成失敗' });
+      return res.status(201).json({ ...newPost });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: '画像アップロード失敗' });
     }
-  });
-  stream.end(file.buffer);
   } else {
     const docRef = await db.collection('posts').add(newPost);
-    return res.status(201).json({ id: docRef.id, ...newPost });
+    return res.status(201).json({ ...newPost });
   }
 };

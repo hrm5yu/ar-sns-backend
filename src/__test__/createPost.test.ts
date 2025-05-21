@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { addMock } from '../utils/__mocks__/firebase';
 import { createApp } from '../createApp';
+import { Request, Response, NextFunction } from 'express';
 
 jest.mock('../utils/firebase');
 
@@ -24,7 +25,6 @@ describe('POST /posts - createPost handler', () => {
     const res = await request(app).post('/posts').send(validBody);
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id', 'mockPostId');
     expect(res.body).toHaveProperty('text', 'こんにちは！');
   });
 
@@ -47,18 +47,14 @@ describe('POST /posts - createPost handler', () => {
   });
 
   it('should fail if user is not authenticated', async () => {
-    // 認証を外す
-    jest.doMock('../middlewares/authenticate', () => ({
-      authenticate: (_req: any, res: any) => {
-        res.status(400).json({ error: 'Unauthorized' });
-      },
-    }));
-
+    jest.resetModules();
+    jest.unmock('../middlewares/authenticate');
     const { createApp } = require('../createApp');
     const app = await createApp();
-
-    const res = await request(app).post('/posts').send(validBody);
+    const res = await request(app)
+      .post('/posts')
+      .send(validBody);
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'Unauthorized');
+    expect(res.body).toHaveProperty('message', '認証トークンがありません');
   });
 });

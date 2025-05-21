@@ -24,5 +24,5 @@ export const createPost = async (req: Request, res: Response) => {
     userId: user.uid,
   };
   const docRef = await db.collection('posts').add(newPost);
-  res.status(201).json({ id: docRef.id, ...newPost });
+  res.status(201).json({ ...newPost });
 };
