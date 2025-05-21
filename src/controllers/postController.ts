@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { admin } from '../utils/firebase';
+import { admin, FieldValue } from '../utils/firebase';
 
 const db = admin.firestore();
 
@@ -17,12 +17,12 @@ export const createPost = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Invalid request body' });
   }
   const newPost = {
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
     latitude,
     longitude,
     text,
     userId: user.uid,
   };
   const docRef = await db.collection('posts').add(newPost);
-  res.status(201).json({ id: docRef.id, ...newPost });
+  res.status(201).json({ ...newPost });
 };

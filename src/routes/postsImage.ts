@@ -10,8 +10,18 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      const err: any = new Error('Only image files are allowed');
+      err.status = 400;
+      cb(err);  
+    }
+  },
 });
 
-router.post('/', authenticate, upload.single('image'), asyncHandler(uploadPostImage));
+router.post('/', authenticate, upload.single('file'), asyncHandler(uploadPostImage));
 
 export default router;

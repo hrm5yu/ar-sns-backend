@@ -1,54 +1,57 @@
 import { Request, Response } from 'express';
-import { bucket, admin } from '../utils/firebase';
+import { bucket, admin, FieldValue } from '../utils/firebase';
 
 const db = admin.firestore();
 
 export const uploadPostImage = async (req: Request, res: Response): Promise<any> => {
-  const file = (req as any).file as Express.Multer.File;
-  if (!file) {
-    return res.status(400).json({ error: 'No file uploaded.' });
-  }
-  const user = (req as any).user;    // authenticate でセット済み
+  const file = (req as any).file as Express.Multer.File | undefined;
+
   if (!req.user || !req.user.uid) {
     return res.status(400).json({ error: 'Unauthorized' });
   }
-  const { latitude, longitude, text } = req.body;
-  const isValidLatitude = typeof latitude === 'number' && latitude >= -90 && latitude <= 90;
-  const isValidLongitude = typeof longitude === 'number' && longitude >= -180 && longitude <= 180;
+  const user = (req as any).user;
+  const latitude = parseFloat(req.body.latitude);
+  const longitude = parseFloat(req.body.longitude);
+  const text = req.body.text;
+
+  const isValidLatitude = !isNaN(latitude) && latitude >= -90 && latitude <= 90;
+  const isValidLongitude = !isNaN(longitude) && longitude >= -180 && longitude <= 180;
   const isValidText = typeof text === 'string' && text.length > 0 && text.length <= 200;
-  
   if (!isValidLatitude || !isValidLongitude || !isValidText) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
-  // 1) Firebase Storage にアップロード
-  const fileName = `${Date.now()}_${file.originalname}`;
-  const fileObj = bucket.file(fileName);
-  const stream = fileObj.createWriteStream({
-    metadata: { contentType: file.mimetype }
-    });
-  stream.end(file.buffer);
-  stream.on('error', (err) => {
-    console.error(err);
-    return res.status(500).json({ error: '画像アップロード失敗' });
-  });
-  stream.on('finish', async () => {
+
+  const newPost: any = {
+    userId: user.uid,
+    latitude,
+    longitude,
+    text,
+    createdAt: FieldValue.serverTimestamp(),
+  };
+
+  if (file) {
+    const fileName = `${Date.now()}_${file.originalname}`;
+    const fileObj = bucket.file(fileName);
+
     try {
-      await fileObj.makePublic();
+      // Firebase Storageにファイルを保存
+      await fileObj.save(file.buffer, {
+        metadata: { contentType: file.mimetype },
+      });
+
+      // 画像のパブリックURLを直接構築
       const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-      // 2) Firestore に投稿ドキュメントを作成
-      const newPost = {
-        userId: user.uid,
-        latitude,
-        longitude,
-        text,
-        imageUrl,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
+
+      newPost.imageUrl = imageUrl;
+
       const docRef = await db.collection('posts').add(newPost);
-      return res.status(201).json({ id: docRef.id, ...newPost });
-    } catch (e) {
-      console.error(e);
-      return res.status(500).json({ error: '投稿作成失敗' });
+      return res.status(201).json({ ...newPost });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: '画像アップロード失敗' });
     }
-  });
+  } else {
+    const docRef = await db.collection('posts').add(newPost);
+    return res.status(201).json({ ...newPost });
+  }
 };
